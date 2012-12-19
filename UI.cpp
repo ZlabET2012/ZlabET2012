@@ -3,10 +3,8 @@
 UI::UI(void){
 }
 
-UI::UI(TouchSensor _touchSensor, BlueTooth _blueTooth, LightSensor _lightSensor, Tail _tail){
+UI::UI(TouchSensor _touchSensor, Tail _tail){
 	touchSensor = _touchSensor;
-	blueTooth = _blueTooth;
-	lightSensor = _lightSensor;
 	tail = _tail;
 }
 
@@ -20,31 +18,7 @@ void UI::waitStart(float angle){
 			display_update();
 			break;
 		}
-		if(blueTooth.isReceived() == 1){
-			display_goto_xy(6, 5);
-			display_string("GO !!");
-			display_update();
-			break;
-		}
 	}
-}
-
-// キャリブレーションを行う
-U16 UI::calibrate(float angle){
-	// タッチセンサの入力を待つ
-	while(1){
-		tail.control(angle);
-		if(touchSensor.isPressed()){
-			break;
-		}
-		// 10msecウェイトする
-		systick_wait_ms(10); 	
-	}
-
-	// 1000msecウェイトする
-	systick_wait_ms(1000);
-
-	return lightSensor.getBrightness();
 }
 
 int UI::courseSelect(){

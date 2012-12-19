@@ -1,20 +1,8 @@
-#include "LightSensor.h"
-#include "GyroSensor.h"
-#include "SonarSensor.h"
 #include "TouchSensor.h"
-#include "BlueTooth.h"
 #include "Motor.h"
 #include "Tail.h"
-#include "Input.h"
 #include "UI.h"
-#include "PID.h"
-#include "balanceControl.h"
 #include "Control.h"
-#include "SlopeDetection.h"
-#include "ColorDetection.h"
-#include "ObstacleDetection.h"
-#include "Detection.h"
-#include "Section.h"
 
 extern "C"{
 	#include "kernel.h"
@@ -54,41 +42,23 @@ void user_1ms_isr_type2(void){
 }
 
 extern "C" TASK(TaskMain){
-	LightSensor *lightSensor = new LightSensor(NXT_PORT_S1);
-	GyroSensor *gyroSensor = new GyroSensor(NXT_PORT_S2);
-	SonarSensor *sonarSensor = new SonarSensor(NXT_PORT_S3);
 	TouchSensor *touchSensor = new TouchSensor(NXT_PORT_S4);
 	Motor *rightMotor = new Motor(NXT_PORT_A);
 	Tail *tail = new Tail(NXT_PORT_B);
 	Motor *leftMotor = new Motor(NXT_PORT_C);
-	BlueTooth *blueTooth = new BlueTooth();
-	UI *ui = new UI(*touchSensor, *blueTooth, *lightSensor, *tail);
-	Input *input = new Input(*gyroSensor, *lightSensor, *sonarSensor);
-	PID *pid = new PID();
-	BalanceControl *balanceControl = new BalanceControl();
-	Control *control = new Control(*pid, *balanceControl, *leftMotor, *rightMotor, *tail);
-	SlopeDetection *slopeDetection = new SlopeDetection();
-	ColorDetection *colorDetection = new ColorDetection();
-	ObstacleDetection *obstacleDetection = new ObstacleDetection();
-	
-	int course = ui->courseSelect();
+	UI *ui = new UI(*touchSensor, *tail);
+	Control *control = new Control(*leftMotor, *rightMotor, *tail);
 		
-	if(course == 1){
-		// ‹æŠÔ‘JˆÚğŒ‚Ìİ’è
-		//                                        gyro_threshold,    g, light_threshold,    l,    s, count
-		Detection *basicDetection = new Detection(             0,   -1,               0,   -1,   -1,   500, *slopeDetection, *colorDetection, *obstacleDetection);
-		// ‹æŠÔƒpƒ‰ƒ[ƒ^İ’è
-		//                           forward,forward_var, turn,tail,tail_var,gyro_offset,pid_flag, pid_target,   KP,balance_flag,balance_init
-		Section *basic = new Section(    100,          0,    0,  90,       0,          0,    TRUE,        600, -0.7,       FALSE,       FALSE, *input, *control, *basicDetection);
-		
+	if(ui->courseSelect() == 1){
 		ui->waitStart(100);
-		
-		basic->basicRun();
-		
+		while(1){
+			control->run(50, 100);
+		}
 	}
 	else{
+		ui->waitStart(100);
 		while(1){
-			
+			control->run(-50, 100);
 		}
 	}
 }

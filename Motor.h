@@ -12,8 +12,6 @@ private:
 public:
 	Motor();
 	Motor(MOTOR_PORT_T _outputPort);
-	void resetAngle();
-	long getAngle();
 	void rotate(float pwm);
 };
 
