@@ -16,7 +16,4 @@ void Control::run(float forward, float tail_angle){
 	// ƒ‚[ƒ^‚ğ‰ñ“]‚³‚¹‚é
 	leftMotor.rotate(forward);
 	rightMotor.rotate(forward);
-		
-	/* ƒƒMƒ“ƒO */
-	ecrobot_bt_data_logger(0, 0);
 }
